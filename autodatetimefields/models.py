@@ -14,11 +14,16 @@
 
 from django.db.models import DateTimeField
 from datetime import datetime
+from django.conf import settings
+from django.utils import timezone
 
 
 class AutoDateTimeField(DateTimeField):
     def pre_save(self, model_instance, add):
-        now = datetime.now()
+        if settings.USE_TZ:
+            now = timezone.now()
+        else:
+            now = datetime.now()
         setattr(model_instance, self.attname, now)
         return now
 
@@ -27,6 +32,9 @@ class AutoNewDateTimeField(DateTimeField):
     def pre_save(self, model_instance, add):
         if not add:
             return getattr(model_instance, self.attname)
-        now = datetime.now()
+        if settings.USE_TZ:
+            now = timezone.now()
+        else:
+            now = datetime.now()
         setattr(model_instance, self.attname, now)
         return now
